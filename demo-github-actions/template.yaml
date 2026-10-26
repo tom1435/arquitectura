@@ -1,0 +1,124 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+
+Description: >
+  Alerta Frontal - frontend estático en S3 y backend serverless.
+
+Parameters:
+  AppVersion:
+    Type: String
+    Default: v1
+
+  LambdaExecutionRoleArn:
+    Type: String
+    Description: ARN de un rol IAM existente para Lambda
+
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    Architectures:
+      - arm64
+    MemorySize: 128
+    Timeout: 15
+    Environment:
+      Variables:
+        APP_VERSION: !Ref AppVersion
+
+Resources:
+  WeatherApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: "$default"
+
+      CorsConfiguration:
+        AllowOrigins:
+          - "*"
+        AllowHeaders:
+          - Content-Type
+        AllowMethods:
+          - GET
+          - OPTIONS
+
+  WeatherFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: alerta-frontal-weather
+      CodeUri: backend/
+      Handler: src/handler.handler
+      Role: !Ref LambdaExecutionRoleArn
+
+      Events:
+        Health:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref WeatherApi
+            Path: /api/health
+            Method: GET
+
+        Cities:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref WeatherApi
+            Path: /api/cities
+            Method: GET
+
+        Weather:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref WeatherApi
+            Path: /api/weather
+            Method: GET
+
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        IgnorePublicAcls: false
+        BlockPublicPolicy: false
+        RestrictPublicBuckets: false
+
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+      VersioningConfiguration:
+        Status: Enabled
+
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucket
+
+      PolicyDocument:
+        Version: "2012-10-17"
+
+        Statement:
+          - Sid: PublicReadForWebsite
+            Effect: Allow
+            Principal: "*"
+
+            Action:
+              - s3:GetObject
+
+            Resource: !Sub "${FrontendBucket.Arn}/*"
+
+Outputs:
+  ApiUrl:
+    Description: URL de API Gateway
+    Value: !Sub
+      - "https://${ApiId}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
+      - ApiId: !Ref WeatherApi
+
+  FrontendBucketName:
+    Description: Bucket donde se publica el frontend
+    Value: !Ref FrontendBucket
+
+  FrontendWebsiteUrl:
+    Description: URL pública del sitio S3
+    Value: !GetAtt FrontendBucket.WebsiteURL

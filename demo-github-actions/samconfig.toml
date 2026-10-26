@@ -1,0 +1,13 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "sam-demo-meteo"
+resolve_s3 = true
+s3_prefix = "sam-demo-meteo"
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "AppVersion=\"v1\" LambdaExecutionRoleArn=\"arn:aws:iam::291513715171:role/LabRole\""
+image_repositories = []
+confirm_changeset = true
+
+[default.global.parameters]
+region = "us-east-1"

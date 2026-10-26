@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>Halerta</title>
+
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <main class="page">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Monitoreo meteorológico</p>
+        <h1>Alerta!</h1>
+        <p class="hero-description">
+          Pronóstico de precipitaciones para las próximas 24 horas.
+        </p>
+      </div>
+
+      <div class="source-badge">
+        Datos: Open-Meteo
+      </div>
+    </header>
+
+    <section class="controls-panel">
+      <div class="field">
+        <label for="city">Ciudad</label>
+
+        <select id="city">
+          <option value="santiago">Santiago</option>
+          <option value="valparaiso">Valparaíso</option>
+          <option value="concepcion">Concepción</option>
+          <option value="temuco">Temuco</option>
+          <option value="puerto_montt">Puerto Montt</option>
+        </select>
+      </div>
+
+      <button id="refresh-button" type="button">
+        Actualizar pronóstico
+      </button>
+    </section>
+
+    <section id="loading" class="status-message">
+      Cargando información meteorológica...
+    </section>
+
+    <section id="error" class="status-message error hidden">
+      No fue posible obtener el pronóstico.
+    </section>
+
+    <section id="weather-content" class="hidden">
+      <section id="risk-card" class="risk-card">
+        <div>
+          <p class="card-label">Nivel de riesgo</p>
+          <h2 id="risk-label">—</h2>
+          <p id="risk-message">—</p>
+        </div>
+
+        <div id="risk-indicator" class="risk-indicator">
+          —
+        </div>
+      </section>
+
+      <section class="metrics-grid">
+        <article class="metric-card">
+          <p class="card-label">Temperatura actual</p>
+          <p class="metric-value">
+            <span id="temperature">—</span>
+            <span class="metric-unit">°C</span>
+          </p>
+        </article>
+
+        <article class="metric-card">
+          <p class="card-label">Lluvia próximas 24 horas</p>
+          <p class="metric-value">
+            <span id="rain">—</span>
+            <span class="metric-unit">mm</span>
+          </p>
+        </article>
+
+        <article class="metric-card">
+          <p class="card-label">Probabilidad máxima</p>
+          <p class="metric-value">
+            <span id="probability">—</span>
+            <span class="metric-unit">%</span>
+          </p>
+        </article>
+
+        <article class="metric-card">
+          <p class="card-label">Viento actual</p>
+          <p class="metric-value">
+            <span id="wind">—</span>
+            <span class="metric-unit">km/h</span>
+          </p>
+        </article>
+      </section>
+
+      <section class="forecast-panel">
+        <div class="section-heading">
+          <div>
+            <p class="card-label">Pronóstico horario</p>
+            <h2>Precipitación esperada</h2>
+          </div>
+
+          <p id="city-name" class="city-name">—</p>
+        </div>
+
+        <div id="hourly-forecast" class="hourly-forecast"></div>
+      </section>
+
+      <section class="diagnostics-panel">
+        <div>
+          <span class="diagnostic-label">Backend</span>
+          <strong id="backend-version">—</strong>
+        </div>
+
+        <div>
+          <span class="diagnostic-label">Actualizado</span>
+          <strong id="generated-at">—</strong>
+        </div>
+
+        <div>
+          <span class="diagnostic-label">Fuente</span>
+          <strong id="source">—</strong>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>s
